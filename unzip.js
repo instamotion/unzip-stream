@@ -1,4 +1,2 @@
-'use strict';
-
-exports.Parse = require('./lib/parser-stream');
-exports.Extract = require('./lib/extract');
+exports.Parse = require('./src/parser-stream');
+exports.Extract = require('./src/extract');

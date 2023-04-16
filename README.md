@@ -1,4 +1,4 @@
-# unzip-stream [![Build Status](https://travis-ci.org/mhr3/unzip-stream.svg?branch=master)](https://travis-ci.org/mhr3/unzip-stream)
+# unzip-stream
 
 Streaming cross-platform unzip tool written in node.js.
 
@@ -10,7 +10,7 @@ Please note that the zip file format isn't really meant to be processed by strea
 ## Installation
 
 ```bash
-$ npm install unzip-stream
+> npm install @instamotion/unzip-stream
 ```
 
 ## Quick Examples
@@ -23,13 +23,14 @@ __Important__: If you do not intend to consume an entry stream's raw data, call 
 contents. Otherwise the stream will get stuck.
 
 ```javascript
+const fs = require('fs');
+const unzip = require('@instamotion/unzip');
+
 fs.createReadStream('path/to/archive.zip')
-  .pipe(unzip.Parse())
-  .on('entry', function (entry) {
-    var filePath = entry.path;
-    var type = entry.type; // 'Directory' or 'File'
-    var size = entry.size; // might be undefined in some archives
-    if (filePath === "this IS the file I'm looking for") {
+  .pipe(new unzip.Parse())
+  .on('entry', (entry) => {
+    const { path: filePath, type, size } = entry;
+    if (filePath === `this IS the file I'm looking for`) {
       entry.pipe(fs.createWriteStream('output/path'));
     } else {
       entry.autodrain();
@@ -43,18 +44,21 @@ If you `pipe` from unzip-stream the downstream components will receive each `ent
 
 Example using `stream.Transform`:
 
-```js
+```javascript
+const fs = require('fs');
+const stream = require('stream');
+const unzip = require('@instamotion/unzip');
+
 fs.createReadStream('path/to/archive.zip')
-  .pipe(unzip.Parse())
+  .pipe(new unzip.Parse())
   .pipe(stream.Transform({
     objectMode: true,
-    transform: function(entry,e,cb) {
-      var filePath = entry.path;
-      var type = entry.type; // 'Directory' or 'File'
-      var size = entry.size;
-      if (filePath === "this IS the file I'm looking for") {
+    transform: (entry, e, cb) => {
+      const { path: filePath, type, size } = entry;
+
+      if (filePath === `this IS the file I'm looking for`) {
         entry.pipe(fs.createWriteStream('output/path'))
-          .on('finish',cb);
+          .on('finish', cb);
       } else {
         entry.autodrain();
         cb();
@@ -65,27 +69,35 @@ fs.createReadStream('path/to/archive.zip')
 ```
 
 ### Extract to a directory
+
 ```javascript
-fs.createReadStream('path/to/archive.zip').pipe(unzip.Extract({ path: 'output/path' }));
+const fs = require('fs');
+const unzip = require('@instamotion/unzip');
+
+fs.createReadStream('path/to/archive.zip').pipe(
+  new unzip.Extract({ path: 'output/path' })
+);
 ```
 
 Extract will emit the 'close' event when the archive is fully extracted, do NOT use the 'finish' event, which can be emitted before the writing finishes.
 
 ### Extra options
+
 The `Parse` and `Extract` methods allow passing an object with `decodeString` property which will be used to decode non-utf8 file names in the archive. If not specified a fallback will be used.
+
+Example with `iconv-lite`:
+
 ```javascript
-let parser = unzip.Parse({ decodeString: (buffer) => { return iconvLite.decode(buffer, 'iso-8859-2'); } });
+const unzip = require('@instamotion/unzip');
+const iconvLite = require('iconv-lite');
+
+let parser = new unzip.Parse({
+  decodeString: (buffer) => {
+    return iconvLite.decode(buffer, 'iso-8859-2');
+  }
+});
 input.pipe(parser).pipe(...);
 ```
-
-### Change history
-
-- 0.3.0 - Added full support for Zip64
-- 0.2.3 - Fix compatibility with node4
-- 0.2.2 - Better handling of unicode file names
-- 0.2.0 - Make Extract() emit 'close' only once all files are written
-- 0.1.2 - Deal with non-zip64 files larger than 4GB
-- 0.1.0 - Implemented new streaming engine
 
 ### What's missing?
 
