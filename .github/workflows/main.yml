@@ -26,5 +26,5 @@ jobs:
       HUSKY_SKIP_HOOKS: 1
     steps:
       - uses: actions/checkout@v3
-      - run: npm i
+      - run: npm i --ignore-scripts
       - run: npm test
