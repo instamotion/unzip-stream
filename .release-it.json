@@ -12,11 +12,11 @@
     "infile": "CHANGELOG.md"
   },
   "hooks": {
-    "after:bump": "yarn install --mode=update-lockfile",
+    "after:bump": "npm i --package-lock-only",
     "before:init": "git fetch --prune --prune-tags origin"
   },
   "npm": {
-    "publish": false,
+    "publish": true,
     "ignoreVersion": false
   }
 }
