@@ -18,6 +18,11 @@ class ParserStream extends Transform {
     this.unzipStream.on('error', (error) => {
       this.emit('error', error);
     });
+    this.unzipStream.on('end', () => {
+      process.nextTick(() => {
+        this.emit('close');
+      });
+    });
   }
 
   _transform(chunk, encoding, cb) {

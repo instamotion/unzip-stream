@@ -1,7 +1,6 @@
 /* eslint-disable no-underscore-dangle */
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
-const { mkdirp } = require('mkdirp');
 const { Transform } = require('stream');
 const UnzipStream = require('./unzip-stream');
 
@@ -73,7 +72,7 @@ class Extract extends Transform {
     }
 
     // FIXME: calls to mkdirp can still be duplicated
-    mkdirp(directory)
+    fs.ensureDir(directory)
       .then(() => {
         this.createdDirectories[directory] = true;
 

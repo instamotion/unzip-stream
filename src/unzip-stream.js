@@ -390,7 +390,7 @@ class UnzipStream extends Transform {
       // eslint-disable-next-line no-param-reassign
       entry.skip = true;
       setImmediate(() => {
-        entry.emit('error', new Error(message));
+        this.emit('error', new Error(message));
       });
 
       // try to skip over this entry
