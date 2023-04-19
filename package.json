@@ -54,7 +54,6 @@
     "lint-branch-name": "lint-branch-name",
     "commitlint": "commitlint",
     "test:coverage": "jest --coverage",
-    "postinstall": "husky install",
     "lint": "eslint ./src --ext .js",
     "pretty": "prettier --check ./src",
     "pretty:fix": "prettier --write ./src",
